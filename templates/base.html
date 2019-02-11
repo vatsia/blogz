@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head %}
+        <title>{% block title %}{% endblock %} - Juuh elikkäs</title>
+    {% endblock %}
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <!-- Spectre.css -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <!-- Own modifications -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }} ">
+</head>
+<body>
+    <div class="wrapper">
+        <header class="navbar links">
+            <section class="navbar-section">
+                <a href="/" class="mr-2">Ovatsia.fi</a>
+                <a href="/" class="">Johonkin</a>
+                <a href="/" class="">Toisaalle</a>
+                <a href="/" class="">minne</a>
+                <a href="/" class="">Sinne</a>
+            </section>
+        </header>
+
+        {% if header_bg is not defined %}
+            <div class="container main-header-bg" style="background-image: url('{{ url_for('static', filename='karigasniemi.jpg') }}')">
+        {% else %}
+            <div class="container main-header-bg" style="background-image: url('{{ url_for('static', filename=header_bg) }}')">
+        {% endif %}
+
+            <div class="columns">
+                <div class="hero hero-lg main-header">
+                    <div class="hero-body main-header">
+                        <h1 class="main-header-h1">{% block header %}{% endblock %}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container content-bg">
+            <div class="columns">
+                <div class="col-12 content">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <ul class=flashes>
+                                {% for category, message in messages %}
+                                    <li class="{{ category }}">{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer-decorations">
+            <p>
+                {% block footer %}{% endblock %}
+            </p>
+            <p>
+                &copy; Olli Vatsia
+            </p>
+        </footer>
+    </div>
+
+</body>
+</html>

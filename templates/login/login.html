@@ -1,0 +1,25 @@
+
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block header %}Log in{% endblock %}
+{% block content %}
+    <form method="POST" action="{{ url_for('login') }}">
+        <table>
+            {% for field in form %}
+                <tr>
+                    {% if field.type == 'BooleanField' %}
+                        <td>{{ field }} {{ field.label }}</td>
+                        <td></td>
+                    {% elif field.type == 'SubmitField' %}
+                        <td>{{ field }}</td>
+                        <td></td>
+                    {% else %}
+                        <td>{{ field }}</td>
+                        <td>{{ field.label }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    </form>
+
+{% endblock %}
