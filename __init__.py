@@ -11,7 +11,7 @@ from flask_login import LoginManager, current_user, login_user
 
 from db import db_session, init_db
 from models import User
-from loginform import LoginForm
+from forms import LoginForm, SigninForm
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -98,5 +98,17 @@ def create_app(test_config=None):
             return redirect(url_for('index'))
         return render_template('login/login.html', form=form)
 
+    @app.route('/signin', methods=['POST', 'GET'])
+    def signin():
+        form = SigninForm()
+        if request.method == 'POST': #TODO validate form
+            if form.password.data == form.password_confirmation.data:
+                newuser = User(str(form.username.data), False, True, False, str(form.password.data))
+                db_session.add(newuser)
+                db_session.commit()
+                flash(u'User created succesfully')
+            else:
+                flash(u'Password and password confirmation mismatch')
+        return render_template('login/signin.html', form=form)
     return app
 
