@@ -1,23 +1,17 @@
-#from app.routes import login_manager
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String
 from db import Base
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     name = Column(String(64), unique=True)
-    is_authenticated = Column(Boolean)
-    is_active = Column(Boolean)
-    is_anonymous = Column(Boolean)
     password_hash = Column(String(256))
 
-    def __init__(self, name=None, is_authenticated=None, is_active=None, is_anonymous=None, password=None):
+    def __init__(self, name=None, password=None):
         self.name = name
-        self.is_authenticated = is_authenticated
-        self.is_active = is_active
-        self.is_anonymous = is_anonymous
         self.password_hash = generate_password_hash(password)
 
     def __repr__(self):
@@ -30,9 +24,5 @@ class User(Base):
         return check_password_hash(self.password_hash, password)
 
     def get_id(self):
-        return str(id).encode('utf-8').decode('utf-8')
+        return str(self.id).encode('utf-8').decode('utf-8')
 
-
-#@login_manager.user_loader
-#def load_user(user_id):
-#    return User.query.get(user_id)

@@ -1,16 +1,21 @@
-from wtforms import Form, validators, StringField, PasswordField, SubmitField, BooleanField
+from wtforms import validators, StringField, PasswordField, SubmitField, BooleanField
+from flask_wtf import FlaskForm
 
-
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username = StringField(u'Username', [validators.required(), validators.length(max=64)])
-    password = PasswordField(u'Password', [validators.required()])
+    passw = PasswordField(u'Password', [validators.required()])
     remember = BooleanField(u'Remember me')
     button = SubmitField(u'Log in')
 
 
-class SigninForm(Form):
+class SigninForm(FlaskForm):
     username = StringField(u'username', [validators.required(), validators.length(max=64)])
-    password = PasswordField(u'Password', [validators.required(), validators.length(min=8)])
-    password_confirmation = PasswordField(u'Password confirmation', [validators.required(), validators.length(min=8)])
+    passw = PasswordField(u'Password', [validators.required(), validators.length(min=8)])
+    passw_confirmation = PasswordField(u'Password confirmation', [validators.required(), validators.length(min=8)])
     button = SubmitField(u'Sign in')
 
+class UpdateUserForm(FlaskForm):
+    username = StringField(u'username', [validators.required(), validators.length(max=64)])
+    passw = PasswordField(u'Password', [])
+    passw_confirmation = PasswordField(u'Password confirmation', [])
+    button = SubmitField(u'Update user information')
