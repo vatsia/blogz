@@ -14,7 +14,7 @@ from flask_login import LoginManager, current_user, login_user, logout_user, log
 
 from db import db_session, init_db
 from models import User
-from forms import LoginForm, SigninForm, UpdateUserForm
+from forms import LoginForm, SigninForm, UpdateUserForm, CreatePostForm
 
 
 def create_app(test_config=None):
@@ -72,7 +72,8 @@ def create_app(test_config=None):
     # render post creation page
     @app.route('/post/new')
     def new_post():
-        return render_template('index.html')
+        form = CreatePostForm()
+        return render_template('posts/new.html', form=form)
 
     # render post editing page
     @app.route('/post/<string:page_name>/edit')

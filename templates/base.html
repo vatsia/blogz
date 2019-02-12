@@ -16,6 +16,16 @@
 
     <!-- Own modifications -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }} ">
+
+    <!-- JQuery -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+    {% if current_user.is_authenticated %}
+        <!-- WysiBB -->
+        <script src="http://cdn.wysibb.com/js/jquery.wysibb.min.js"></script>
+        <link rel="stylesheet" href="http://cdn.wysibb.com/css/default/wbbtheme.css" />
+    {% endif %}
+
 </head>
 <body>
     <div class="wrapper">
@@ -64,7 +74,7 @@
                     <p>{{ current_user.name }}</p>
                     <ul>
                         <li><a href="{{ url_for('list_users') }}">List users</a></li>
-                        <li><a href="{{ url_for('') }}" </li>
+                        <li><a href="{{ url_for('new_post') }}">Create new page</a> </li>
                         <li><a href="{{ url_for('logout') }}">Log out</a></li>
                     </ul>
                 </div>

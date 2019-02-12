@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+{% block title %}Create new page{% endblock %}
+{% block header %}Create new page{% endblock %}
+{% block content %}
+    <script>
+        $(function() {
+            $("#content").wysibb();
+        })
+    </script>
+    <form method="POST" action="{{ url_for('create_post') }}">
+        <table>
+            {% for field in form %}
+                <tr>
+                    {% if field.type == 'BooleanField' %}
+                        <td>{{ field }} {{ field.label }}</td>
+                        <td></td>
+                    {% elif field.type == 'SubmitField' %}
+                        <td>{{ field }}</td>
+                        <td></td>
+                    {% elif field.type == 'CsrfField' %}
+                        <td>{{ field }}</td>
+                        <td></td>
+                    {% else %}
+                        <td>{{ field }}</td>
+                        <td>{{ field.label }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    </form>
+{% endblock %}
