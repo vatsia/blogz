@@ -1,0 +1,9 @@
+
+{% extends "base.html" %}
+{% block title %}Posts{% endblock %}
+{% block header %}Posts{% endblock %}
+{% block content %}
+    {% for post in posts %}
+    {{ p.header }}
+    {% endfor %}
+{% endblock %}

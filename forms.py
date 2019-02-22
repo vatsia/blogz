@@ -27,3 +27,4 @@ class CreatePostForm(FlaskForm):
     lead_paragraph = StringField(u'Lead paragraph')
     content = TextAreaField(u'Content')
     is_draft = BooleanField(u'Is draft?')
+    button = SubmitField(u'Create post')

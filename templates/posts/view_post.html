@@ -1,0 +1,7 @@
+
+{% extends "base.html" %}
+{% block title %}{{ p.header }}{% endblock %}
+{% block header %}{{ p.header }}{% endblock %}
+{% block content %}
+    {{ p.content|safe }}
+{% endblock %}

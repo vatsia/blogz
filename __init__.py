@@ -7,13 +7,18 @@ from flask import render_template
 from flask import redirect
 from flask import url_for
 from flask import flash
+from flask import abort
+
+from urllib.parse import quote_plus
+
+import bbcode
 
 from http_method_override import HTTPMethodOverrideMiddleware
 
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 
 from db import db_session, init_db
-from models import User
+from models import User, Post
 from forms import LoginForm, SigninForm, UpdateUserForm, CreatePostForm
 
 
@@ -60,31 +65,55 @@ def create_app(test_config=None):
         return render_template('index.html')
 
     # show posts on page
+    @app.route('/page')
     @app.route('/page/<int:page_num>')
-    def page(page_num):
-        return render_template('index.html')
+    def page(page_num=0):
+        posts = db_session.query(Post).order_by(Post.created.desc()).paginate(page_num, 1, False)
+        return render_template('index.html', posts)
 
     # show whole post or page
     @app.route('/post/<string:page_name>')
     def show_post(page_name):
-        return render_template('index.html')
+        p = Post.query.filter_by(link_address=page_name).first()
+        if p is None:
+            abort(404)
+        if p.is_draft and current_user.is_authenticated is False:
+            abort(403)
+
+        parser = bbcode.Parser()
+        parser.add_simple_formatter(
+            'video',
+            '<iframe width="420" height="315" src="https://www.youtube.com/embed/%(value)s"></iframe>',
+            standalone=False
+        )
+        #p.content = bbcode.render_html(p.content)
+        p.content = parser.format(p.content)
+
+        return render_template('posts/view_post.html', p=p)
 
     # render post creation page
-    @app.route('/post/new')
+    @app.route('/post/new', methods=['GET', 'POST'])
     def new_post():
         form = CreatePostForm()
+        if form.validate_on_submit():
+            p = Post(
+                quote_plus(form.header.data),
+                form.header.data,
+                form.lead_paragraph.data,
+                form.content.data,
+                current_user.id,
+                form.is_draft.data
+            )
+            db_session.add(p)
+            db_session.commit()
+            flash('Post created succesfully!')
+            return redirect(url_for('show_post', page_name=p.link_address))
         return render_template('posts/new.html', form=form)
 
     # render post editing page
     @app.route('/post/<string:page_name>/edit')
     def edit_post(page_name):
         return render_template('index.html')
-
-    # save created post to database
-    @app.route('/post/create', methods=['POST'])
-    def create_post():
-        if request.method == 'POST':
-            return 'creating post'
 
     # update post to database
     @app.route('/post/<string:page_name>/update', methods=['UPDATE'])
