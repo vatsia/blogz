@@ -17,7 +17,7 @@ from http_method_override import HTTPMethodOverrideMiddleware
 
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 
-from db import db_session, init_db
+from db import db_session
 from models import User, Post
 from forms import LoginForm, SigninForm, UpdateUserForm, CreatePostForm
 
@@ -25,7 +25,24 @@ from forms import LoginForm, SigninForm, UpdateUserForm, CreatePostForm
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
-    init_db()
+
+    sqlite_db_path = os.path.join(app.instance_path, 'development.sqlite')
+    app.config.from_mapping(
+        SECRET_KEY='development',
+        SQLALCHEMY_DATABASE_URI='sqlite:///' + sqlite_db_path,
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        POSTS_PER_PAGE=5,
+    )
+
+    db_session.init_app(app)
+
+    # if database file not exists, create it and create root user
+    if User.count() == 0 or User.count() is None:
+        db_session.create_all(app=app)
+        u = User(name='root', password='root123')
+        db_session.add(u)
+        db_session.commit()
+        print('Created root user')
 
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -39,11 +56,6 @@ def create_app(test_config=None):
         flash('Unauthorized request!')
         return redirect(url_for('index'))
 
-    app.config.from_mapping(
-        SECRET_KEY='development',
-        DATABASE=os.path.join(app.instance_path, 'development.sqlite')
-    )
-
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)
     else:
@@ -54,11 +66,6 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # Database initialization
-    @app.teardown_appcontext
-    def shutdown_session(exception=None):
-        db_session.remove()
-
     # index page. 10 newest posts with paging?
     @app.route('/')
     def index():
@@ -67,9 +74,9 @@ def create_app(test_config=None):
     # show posts on page
     @app.route('/page')
     @app.route('/page/<int:page_num>')
-    def page(page_num=0):
-        posts = db_session.query(Post).order_by(Post.created.desc()).paginate(page_num, 1, False)
-        return render_template('index.html', posts)
+    def page(page_num=1):
+        posts = Post.query.paginate(page_num, app.config['POSTS_PER_PAGE'], True)
+        return render_template('index.html', posts=posts)
 
     # show whole post or page
     @app.route('/post/<string:page_name>')

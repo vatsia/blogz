@@ -1,16 +1,16 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
-from sqlalchemy.sql import func
-from db import Base
-from sqlalchemy import BaseQuery
+#from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+#from sqlalchemy.sql import func
+from db import db_session
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 
 
-class User(Base, UserMixin):
+class User(db_session.Model, UserMixin):
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(64), unique=True)
-    password_hash = Column(String(256))
+    id = db_session.Column(db_session.Integer, primary_key=True)
+    name = db_session.Column(db_session.String(64), unique=True)
+    password_hash = db_session.Column(db_session.String(256))
 
     def __init__(self, name=None, password=None):
         self.name = name
@@ -29,16 +29,16 @@ class User(Base, UserMixin):
         return str(self.id).encode('utf-8').decode('utf-8')
 
 
-class Post(Base):
+class Post(db_session.Model):
     __tablename__ = 'posts'
-    id = Column(Integer, primary_key=True)
-    link_address = Column(String, unique=True)
-    header = Column(String)
-    lead_paragraph = Column(String)
-    content = Column(String)
-    writer = Column(Integer, ForeignKey('users.id'))
-    created = Column(DateTime(timezone=True), server_default=func.now())
-    is_draft = Column(Boolean)
+    id = db_session.Column(db_session.Integer, primary_key=True)
+    link_address = db_session.Column(db_session.String, unique=True)
+    header = db_session.Column(db_session.String)
+    lead_paragraph = db_session.Column(db_session.String)
+    content = db_session.Column(db_session.String)
+    writer = db_session.Column(db_session.Integer, db_session.ForeignKey('users.id'))
+    created = db_session.Column(db_session.DateTime(timezone=True), server_default=db_session.func.now())
+    is_draft = db_session.Column(db_session.Boolean)
 
     def __init__(self, link_address=None, header=None, lead_paragraph=None, content=None, writer=None, is_draft=True):
         self.link_address = link_address
