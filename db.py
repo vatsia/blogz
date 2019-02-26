@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 #engine = create_engine('sqlite:///test.db', convert_unicode=True)
 #db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
-db_session = SQLAlchemy()
+db = SQLAlchemy()
 
 #Base = declarative_base()
 #Base.query = db_session.query_property()

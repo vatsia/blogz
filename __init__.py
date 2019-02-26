@@ -17,7 +17,7 @@ from http_method_override import HTTPMethodOverrideMiddleware
 
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 
-from db import db_session
+from db import db
 from models import User, Post
 from forms import LoginForm, SigninForm, UpdateUserForm, CreatePostForm
 
@@ -34,15 +34,8 @@ def create_app(test_config=None):
         POSTS_PER_PAGE=5,
     )
 
-    db_session.init_app(app)
-
-    # if database file not exists, create it and create root user
-    if User.count() == 0 or User.count() is None:
-        db_session.create_all(app=app)
-        u = User(name='root', password='root123')
-        db_session.add(u)
-        db_session.commit()
-        print('Created root user')
+    db.init_app(app)
+    db.create_all(app=app)
 
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -111,8 +104,8 @@ def create_app(test_config=None):
                 current_user.id,
                 form.is_draft.data
             )
-            db_session.add(p)
-            db_session.commit()
+            db.session.add(p)
+            db.session.commit()
             flash('Post created succesfully!')
             return redirect(url_for('show_post', page_name=p.link_address))
         return render_template('posts/new.html', form=form)
@@ -152,12 +145,21 @@ def create_app(test_config=None):
 
     @app.route('/signin', methods=['POST', 'GET'])
     def signin():
+
+        # if database file not exists, create it and create root user
+        if User.query.count() == 0:
+
+            u = User(name='root', password='root123')
+            db.session.session.add(u)
+            db.session.session.commit()
+            print('Created root user')
+
         form = SigninForm()
         if form.validate_on_submit():
             if form.passw.data == form.passw_confirmation.data:
                 newuser = User(str(form.username.data), str(form.passw.data))
-                db_session.add(newuser)
-                db_session.commit()
+                db.session.add(newuser)
+                db.session.commit()
                 flash(u'User created succesfully')
             else:
                 flash(u'Password and password confirmation mismatch')
@@ -192,7 +194,7 @@ def create_app(test_config=None):
                 u.name = form.username.data
             if len(form.passw.data) > 0:
                 u.set_password(form.passw.data)
-            db_session.commit()
+            db.session.commit()
             return redirect(url_for('edit_user', user_id=user_id))
         else:
             form.username.data = u.name
@@ -201,8 +203,8 @@ def create_app(test_config=None):
     @app.route('/users/<int:uid>/delete', methods=['POST', 'DELETE'])
     @login_required
     def delete_user(uid):
-        db_session.delete(User.query.get(uid))
-        db_session.commit()
+        db.session.delete(User.query.get(uid))
+        db.session.commit()
         return redirect(url_for('list_users'))
 
     return app

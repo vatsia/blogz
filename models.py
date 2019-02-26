@@ -1,16 +1,16 @@
 #from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 #from sqlalchemy.sql import func
-from db import db_session
+from db import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 
 
-class User(db_session.Model, UserMixin):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
-    id = db_session.Column(db_session.Integer, primary_key=True)
-    name = db_session.Column(db_session.String(64), unique=True)
-    password_hash = db_session.Column(db_session.String(256))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    password_hash = db.Column(db.String(256))
 
     def __init__(self, name=None, password=None):
         self.name = name
@@ -29,16 +29,16 @@ class User(db_session.Model, UserMixin):
         return str(self.id).encode('utf-8').decode('utf-8')
 
 
-class Post(db_session.Model):
+class Post(db.Model):
     __tablename__ = 'posts'
-    id = db_session.Column(db_session.Integer, primary_key=True)
-    link_address = db_session.Column(db_session.String, unique=True)
-    header = db_session.Column(db_session.String)
-    lead_paragraph = db_session.Column(db_session.String)
-    content = db_session.Column(db_session.String)
-    writer = db_session.Column(db_session.Integer, db_session.ForeignKey('users.id'))
-    created = db_session.Column(db_session.DateTime(timezone=True), server_default=db_session.func.now())
-    is_draft = db_session.Column(db_session.Boolean)
+    id = db.Column(db.Integer, primary_key=True)
+    link_address = db.Column(db.String, unique=True)
+    header = db.Column(db.String)
+    lead_paragraph = db.Column(db.String)
+    content = db.Column(db.String)
+    writer = db.Column(db.Integer, db.ForeignKey('users.id'))
+    created = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+    is_draft = db.Column(db.Boolean)
 
     def __init__(self, link_address=None, header=None, lead_paragraph=None, content=None, writer=None, is_draft=True):
         self.link_address = link_address
