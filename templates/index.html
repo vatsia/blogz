@@ -3,4 +3,31 @@
 {% block title %}Index{% endblock %}
 {% block header %}Lorem ipsum{% endblock %}
 {% block content %}
+    {% for post in posts.items %}
+        <h2>{{ post.header }}</h2>
+    {% endfor %}
+
+    <p>Pages:</p>
+    <ul class="pagination">
+        {% for page in posts.iter_pages() %}
+            {% if page %}
+                {% if page == current_page %}
+                    <li class="page-item active">
+                        <a href="{{ url_for('page', page_num=page) }}" class="text-dark bg-gray">{{ page }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a href="{{ url_for('page', page_num=page) }}" class="text-gray">{{ page }}</a>
+                    </li>
+                {% endif %}
+            {% else %}
+                <li class="page-item">
+                    <span>
+                        ...
+                    </span>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
 {% endblock %}

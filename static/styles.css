@@ -57,12 +57,14 @@ body {
 }
 
 .content a:hover {
-    -webkit-transition: width 2s;
-    transition: width 2s;
-    width: 200px;
     text-decoration: none;
 }
 
 .content-bg {
     background-color: #2D2D2D;
+}
+
+/* change pagination color */
+.page-item-colorchange {
+    background-color: #A0A0A0 !important;
 }

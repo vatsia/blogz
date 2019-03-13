@@ -31,7 +31,7 @@ def create_app(test_config=None):
         SECRET_KEY='development',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + sqlite_db_path,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        POSTS_PER_PAGE=5,
+        POSTS_PER_PAGE=2,
     )
 
     db.init_app(app)
@@ -62,14 +62,15 @@ def create_app(test_config=None):
     # index page. 10 newest posts with paging?
     @app.route('/')
     def index():
-        return render_template('index.html')
+        posts = Post.query.order_by(Post.created.desc()).paginate(1, app.config['POSTS_PER_PAGE'], True)
+        return render_template('index.html', posts=posts, current_page=1)
 
     # show posts on page
     @app.route('/page')
     @app.route('/page/<int:page_num>')
     def page(page_num=1):
-        posts = Post.query.paginate(page_num, app.config['POSTS_PER_PAGE'], True)
-        return render_template('index.html', posts=posts)
+        posts = Post.query.order_by(Post.created.desc()).paginate(page_num, app.config['POSTS_PER_PAGE'], True)
+        return render_template('index.html', posts=posts, current_page=page_num)
 
     # show whole post or page
     @app.route('/post/<string:page_name>')
